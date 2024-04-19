@@ -1,0 +1,108 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <queue>
+#include <list>
+#define NIL 0
+#define INF INT_MAX
+using namespace std;
+
+bool bfs(int m, int n, list<int> *adj, int *pairU, int *pairV, int *dist) {
+    queue<int> Q;
+    for (int u = 1; u <= m; u++) {
+        if (pairU[u] == NIL) {
+            dist[u] = 0;
+            Q.push(u);
+        } else {
+            dist[u] = INF;
+        }
+    }
+    dist[NIL] = INF;
+
+    while (!Q.empty()) {
+        int u = Q.front();
+        Q.pop();
+        if (u != NIL) {
+            for (list<int>::iterator i = adj[u].begin(); i != adj[u].end(); ++i) {
+                int v = *i;
+                if (dist[pairV[v]] == INF) {
+                    dist[pairV[v]] = dist[u] + 1;
+                    Q.push(pairV[v]);
+                }
+            }
+        }
+    }
+    return (dist[NIL] != INF);
+}
+
+bool dfs(int u, list<int> *adj, int *pairU, int *pairV, int *dist) {
+    if (u != NIL) {
+        for (list<int>::iterator i = adj[u].begin(); i != adj[u].end(); ++i) {
+            int v = *i;
+            if (dist[pairV[v]] == dist[u] + 1) {
+                if (dfs(pairV[v], adj, pairU, pairV, dist)) {
+                    pairV[v] = u;
+                    pairU[u] = v;
+                    return true;
+                }
+            }
+        }
+        dist[u] = INF;
+        return false;
+    }
+    return true;
+}
+
+int hopcroftKarp(int m, int n, list<int> *adj) {
+    int *pairU = new int[m + 1];
+    int *pairV = new int[n + 1];
+    int *dist = new int[m + 1];
+    for (int u = 0; u <= m; u++) {
+        pairU[u] = NIL;
+    }
+    for (int v = 0; v <= n; v++) {
+        pairV[v] = NIL;
+    }
+    int matching = 0;
+    while (bfs(m, n, adj, pairU, pairV, dist)) {
+        for (int u = 1; u <= m; u++) {
+            if (pairU[u] == NIL && dfs(u, adj, pairU, pairV, dist)) {
+                matching++;
+            }
+        }
+    }
+    delete[] pairU;
+    delete[] pairV;
+    delete[] dist;
+    return matching;
+}
+int main() {
+    string filename;
+    cout << "Enter the filename containing the graph data: ";
+    cin >> filename;  
+    ifstream file(filename.c_str()); 
+    if (!file.is_open()) {
+        cerr << "Error: Unable to open file!" << endl;
+        return 1;
+    }
+    string line;
+    getline(file, line);
+    stringstream ss(line);
+    int m, n, edges;
+    char comma;
+    ss >> m >> comma >> n >> comma >> edges;
+    list<int> *adj = new list<int>[m + 1];
+    cout << "Reading edges from file..." << endl;
+    for (int i = 0; i < edges; i++) {
+        getline(file, line); 
+        stringstream ss_edge(line);
+        int u, v;
+        ss_edge >> u >> comma >> v; 
+        adj[u].push_back(v);
+    }
+    file.close();
+    cout << "Size of maximum matching is " << hopcroftKarp(m, n, adj) << endl;
+    delete[] adj;
+    return 0;
+}
