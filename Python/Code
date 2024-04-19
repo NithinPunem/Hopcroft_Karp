@@ -1,0 +1,71 @@
+from collections import deque
+
+NIL = 0
+INF = float('inf')
+
+def bfs(m, n, adj, pairU, pairV, dist):
+    Q = deque()
+    for u in range(1, m + 1):
+        if pairU[u] == NIL:
+            dist[u] = 0
+            Q.append(u)
+        else:
+            dist[u] = INF
+    dist[NIL] = INF
+
+    while Q:
+        u = Q.popleft()
+        if u != NIL:
+            for v in adj[u]:
+                if dist[pairV[v]] == INF:
+                    dist[pairV[v]] = dist[u] + 1
+                    Q.append(pairV[v])
+    return dist[NIL] != INF
+
+def dfs(u, adj, pairU, pairV, dist):
+    if u != NIL:
+        for v in adj[u]:
+            if dist[pairV[v]] == dist[u] + 1:
+                if dfs(pairV[v], adj, pairU, pairV, dist):
+                    pairV[v] = u
+                    pairU[u] = v
+                    return True
+        dist[u] = INF
+        return False
+    return True
+
+def hopcroft_karp(m, n, adj):
+    pairU = [NIL] * (m + 1)
+    pairV = [NIL] * (n + 1)
+    dist = [NIL] * (m + 1)
+    
+    matching = 0
+    while bfs(m, n, adj, pairU, pairV, dist):
+        for u in range(1, m + 1):
+            if pairU[u] == NIL and dfs(u, adj, pairU, pairV, dist):
+                matching += 1
+    return matching
+
+def main():
+    filename = input("Enter the filename containing the graph data: ")
+    try:
+        with open(filename) as file:
+            m, n, _ = map(int, file.readline().strip().split(','))
+            adj = [[] for _ in range(m + 1)]
+            print("Reading edges from file...")
+            for line in file:
+                u, v = map(int, line.strip().split(','))
+                adj[u].append(v)
+        
+        max_matching_size = hopcroft_karp(m, n, adj)
+        print(f"Size of maximum matching is {max_matching_size}")
+
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+    except (ValueError, IndexError):
+        print("Error: Invalid data format in the input file.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if _name_ == "_main_":
+    main()
