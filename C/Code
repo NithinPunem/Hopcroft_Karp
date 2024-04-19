@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define NIL 0
+#define INF INT_MAX
+
+struct ListNode {
+    int vertex;
+    struct ListNode* next;
+};
+
+int bfs(int m, int n, struct ListNode **adj, int *pairU, int *pairV, int *dist) {
+}
+
+int dfs(int u, struct ListNode **adj, int *pairU, int *pairV, int *dist) {
+}
+
+int hopcroftKarp(int m, int n, struct ListNode **adj) {
+}
+
+int main() {
+    char filename[100];
+    printf("Enter the filename containing the graph data: ");
+    scanf("%s", filename);
+
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error: Unable to open file!\n");
+        return 1;
+    }
+
+    int m, n, edges;
+    fscanf(file, "%d,%d,%d", &m, &n, &edges);
+    struct ListNode **adj = (struct ListNode **)malloc((m + 1) * sizeof(struct ListNode *));
+    int i;
+    for (i = 0; i <= m; i++) {
+        adj[i] = NULL;
+    }
+    printf("Reading edges from file...\n");
+    for (i = 0; i < edges; i++) {
+        int u, v;
+        fscanf(file, "%d,%d", &u, &v);
+        struct ListNode* newNode1 = (struct ListNode*)malloc(sizeof(struct ListNode));
+        newNode1->vertex = v;
+        newNode1->next = adj[u];
+        adj[u] = newNode1;
+        struct ListNode* newNode2 = (struct ListNode*)malloc(sizeof(struct ListNode));
+        newNode2->vertex = u;
+        newNode2->next = adj[v];
+        adj[v] = newNode2;
+    }
+    fclose(file);
+    printf("Size of maximum matching is %d\n", hopcroftKarp(m, n, adj));
+    for (i = 0; i <= m; i++) {
+        struct ListNode* current = adj[i];
+        while (current != NULL) {
+            struct ListNode* temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+    free(adj);
+    return 0;
+}
