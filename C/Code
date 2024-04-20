@@ -1,21 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
+
 #define NIL 0
 #define INF INT_MAX
 
 struct ListNode {
-    int vertex;
+    char vertex;
     struct ListNode* next;
 };
 
 int bfs(int m, int n, struct ListNode **adj, int *pairU, int *pairV, int *dist) {
+    // Implement BFS with character vertices
 }
 
-int dfs(int u, struct ListNode **adj, int *pairU, int *pairV, int *dist) {
+int dfs(char u, struct ListNode **adj, int *pairU, int *pairV, int *dist) {
+    // Implement DFS with character vertices
 }
 
 int hopcroftKarp(int m, int n, struct ListNode **adj) {
+    // Implement Hopcroft-Karp algorithm with character vertices
 }
 
 int main() {
@@ -38,8 +43,8 @@ int main() {
     }
     printf("Reading edges from file...\n");
     for (i = 0; i < edges; i++) {
-        int u, v;
-        fscanf(file, "%d,%d", &u, &v);
+        char u, v;
+        fscanf(file, " %c,%c", &u, &v); // Note the space before %c to skip whitespace
         struct ListNode* newNode1 = (struct ListNode*)malloc(sizeof(struct ListNode));
         newNode1->vertex = v;
         newNode1->next = adj[u];
