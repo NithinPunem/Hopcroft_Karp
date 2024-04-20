@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 #include <list>
+#include <map>
 #define NIL 0
 #define INF INT_MAX
 using namespace std;
@@ -77,6 +78,7 @@ int hopcroftKarp(int m, int n, list<int> *adj) {
     delete[] dist;
     return matching;
 }
+
 int main() {
     string filename;
     cout << "Enter the filename containing the graph data: ";
@@ -93,13 +95,20 @@ int main() {
     char comma;
     ss >> m >> comma >> n >> comma >> edges;
     list<int> *adj = new list<int>[m + 1];
+    map<char, int> vertexMap;
+    char vertexChar;
+    int vertexID = 1;
     cout << "Reading edges from file..." << endl;
     for (int i = 0; i < edges; i++) {
         getline(file, line); 
         stringstream ss_edge(line);
-        int u, v;
-        ss_edge >> u >> comma >> v; 
-        adj[u].push_back(v);
+        char uChar;
+        int v;
+        ss_edge >> uChar >> comma >> v; 
+        if (vertexMap.find(uChar) == vertexMap.end()) {
+            vertexMap[uChar] = vertexID++;
+        }
+        adj[vertexMap[uChar]].push_back(v);
     }
     file.close();
     cout << "Size of maximum matching is " << hopcroftKarp(m, n, adj) << endl;
